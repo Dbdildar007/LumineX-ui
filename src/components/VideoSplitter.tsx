@@ -467,21 +467,22 @@ function CompletionCard({
   );
 }
 
-function IsolationWarning() {
+function IsolationNotice() {
   return (
-    <Alert variant="destructive">
+    <Alert>
       <ShieldAlert className="size-4" />
-      <AlertTitle>Cross-origin isolation required</AlertTitle>
+      <AlertTitle>Single-threaded mode</AlertTitle>
       <AlertDescription className="mt-2 space-y-2">
         <p className="text-sm">
-          This page is not cross-origin isolated, so FFmpeg WebAssembly cannot run. The server must
-          send COOP/COEP headers.
+          This page isn't cross-origin isolated, so FFmpeg will run in single-threaded mode.
+          Splitting still works — large files may simply take longer.
         </p>
         <HeadersDialog />
       </AlertDescription>
     </Alert>
   );
 }
+
 
 function HeadersDialog() {
   return (
