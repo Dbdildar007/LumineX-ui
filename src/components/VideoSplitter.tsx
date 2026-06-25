@@ -116,14 +116,6 @@ export function VideoSplitter() {
 
   const processVideo = async () => {
     if (!file) return;
-    if (!isCrossOriginIsolated()) {
-      setError(
-        "Browser is not cross-origin isolated. COOP/COEP headers must be enabled to run FFmpeg WebAssembly.",
-      );
-      setPhase("error");
-      return;
-    }
-
     const startedAt = performance.now();
     const videoName = sanitizeName(file.name);
     setError(null);
