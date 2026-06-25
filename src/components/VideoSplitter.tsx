@@ -116,14 +116,6 @@ export function VideoSplitter() {
 
   const processVideo = async () => {
     if (!file) return;
-    if (!isCrossOriginIsolated()) {
-      setError(
-        "Browser is not cross-origin isolated. COOP/COEP headers must be enabled to run FFmpeg WebAssembly.",
-      );
-      setPhase("error");
-      return;
-    }
-
     const startedAt = performance.now();
     const videoName = sanitizeName(file.name);
     setError(null);
@@ -299,7 +291,7 @@ export function VideoSplitter() {
         </p>
       </header>
 
-      {!isolated && <IsolationWarning />}
+      {!isolated && <IsolationNotice />}
 
       <DropZone
         file={file}
@@ -324,7 +316,7 @@ export function VideoSplitter() {
 
       {file && phase === "idle" && (
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
-          <Button size="lg" onClick={processVideo} disabled={!isolated} className="w-full sm:w-auto">
+          <Button size="lg" onClick={processVideo} className="w-full sm:w-auto">
             Split into 30s chunks
           </Button>
           <Button size="lg" variant="outline" onClick={reset} className="w-full sm:w-auto">
@@ -475,21 +467,22 @@ function CompletionCard({
   );
 }
 
-function IsolationWarning() {
+function IsolationNotice() {
   return (
-    <Alert variant="destructive">
+    <Alert>
       <ShieldAlert className="size-4" />
-      <AlertTitle>Cross-origin isolation required</AlertTitle>
+      <AlertTitle>Single-threaded mode</AlertTitle>
       <AlertDescription className="mt-2 space-y-2">
         <p className="text-sm">
-          This page is not cross-origin isolated, so FFmpeg WebAssembly cannot run. The server must
-          send COOP/COEP headers.
+          This page isn't cross-origin isolated, so FFmpeg will run in single-threaded mode.
+          Splitting still works — large files may simply take longer.
         </p>
         <HeadersDialog />
       </AlertDescription>
     </Alert>
   );
 }
+
 
 function HeadersDialog() {
   return (
