@@ -124,16 +124,23 @@ export function VideoSplitter() {
 
     try {
       setPhase("loading");
-      setStatusText("Loading FFmpeg cores...");
+      setStatusText("Loading FFmpeg core (≈30MB, first time only)...");
+      setProgress(2);
       const ffmpeg = await getFFmpeg(
-        () => {},
+        (msg) => {
+          // Surface latest ffmpeg log so users see real progress
+          if (msg && msg.length < 200) setStatusText(msg);
+        },
         (ratio) => {
-          if (ratio > 0 && ratio <= 1) setProgress(Math.round(ratio * 100));
+          if (ratio > 0 && ratio <= 1) {
+            // Map ffmpeg exec progress into the 10-85 range during splitting
+            setProgress(10 + Math.round(ratio * 75));
+          }
         },
       );
 
       setPhase("analyzing");
-      setStatusText("Analyzing video & keyframes...");
+      setStatusText("Reading video file...");
       setProgress(5);
 
       const inputName = `input.${(file.name.split(".").pop() || "mp4").toLowerCase()}`;
