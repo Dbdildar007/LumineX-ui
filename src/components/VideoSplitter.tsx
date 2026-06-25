@@ -316,7 +316,7 @@ export function VideoSplitter() {
 
       {file && phase === "idle" && (
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
-          <Button size="lg" onClick={processVideo} disabled={!isolated} className="w-full sm:w-auto">
+          <Button size="lg" onClick={processVideo} className="w-full sm:w-auto">
             Split into 30s chunks
           </Button>
           <Button size="lg" variant="outline" onClick={reset} className="w-full sm:w-auto">
