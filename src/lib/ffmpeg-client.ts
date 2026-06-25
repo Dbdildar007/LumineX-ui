@@ -1,14 +1,17 @@
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { toBlobURL } from "@ffmpeg/util";
+// Vite bundles the worker module and gives us a URL we can pass to FFmpeg.
+// This resolves the worker's relative imports at build time so it can run
+// from a module Worker without "Failed to fetch module" errors.
+import ffmpegWorkerURL from "./ffmpeg-worker-entry.ts?worker&url";
 
 let ffmpegInstance: FFmpeg | null = null;
 let loadPromise: Promise<FFmpeg> | null = null;
 
 const CORE_VERSION = "0.12.6";
-const FFMPEG_VERSION = "0.12.15";
-// ESM core works with module workers (UMD requires importScripts which module workers lack)
+// ESM core works with module workers; UMD core requires importScripts which
+// module workers lack.
 const CORE_BASE = `https://cdn.jsdelivr.net/npm/@ffmpeg/core@${CORE_VERSION}/dist/esm`;
-const WORKER_URL = `https://cdn.jsdelivr.net/npm/@ffmpeg/ffmpeg@${FFMPEG_VERSION}/dist/esm/worker.js`;
 
 export async function getFFmpeg(
   onLog?: (msg: string) => void,
@@ -31,13 +34,12 @@ export async function getFFmpeg(
       });
       if (onProgress) ffmpeg.on("progress", ({ progress }) => onProgress(progress));
 
-      const [coreURL, wasmURL, classWorkerURL] = await Promise.all([
+      const [coreURL, wasmURL] = await Promise.all([
         toBlobURL(`${CORE_BASE}/ffmpeg-core.js`, "text/javascript"),
         toBlobURL(`${CORE_BASE}/ffmpeg-core.wasm`, "application/wasm"),
-        toBlobURL(WORKER_URL, "text/javascript"),
       ]);
 
-      await ffmpeg.load({ coreURL, wasmURL, classWorkerURL });
+      await ffmpeg.load({ coreURL, wasmURL, classWorkerURL: ffmpegWorkerURL });
       ffmpegInstance = ffmpeg;
       return ffmpeg;
     } catch (e) {
