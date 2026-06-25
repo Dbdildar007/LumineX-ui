@@ -291,7 +291,7 @@ export function VideoSplitter() {
         </p>
       </header>
 
-      {!isolated && <IsolationWarning />}
+      {!isolated && <IsolationNotice />}
 
       <DropZone
         file={file}
