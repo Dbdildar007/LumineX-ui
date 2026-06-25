@@ -8,9 +8,10 @@ import ffmpegWorkerURL from "./ffmpeg-worker-entry.ts?worker&url";
 let ffmpegInstance: FFmpeg | null = null;
 let loadPromise: Promise<FFmpeg> | null = null;
 
-const CORE_VERSION = "0.12.6";
-// ESM core works with module workers; UMD core requires importScripts which
-// module workers lack.
+const CORE_VERSION = "0.12.10";
+// ESM core (with default export) works with module workers; UMD core needs
+// importScripts which module workers lack. 0.12.6 ESM lacks the default
+// export — 0.12.10+ ships it.
 const CORE_BASE = `https://cdn.jsdelivr.net/npm/@ffmpeg/core@${CORE_VERSION}/dist/esm`;
 
 export async function getFFmpeg(
