@@ -1,29 +1,30 @@
 import { createFileRoute } from "@tanstack/react-router";
 
+import { VideoSplitter } from "@/components/VideoSplitter";
+
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Your App" },
-      { name: "description", content: "Replace this with a one-sentence description of your app." },
-      { property: "og:title", content: "Your App" },
-      { property: "og:description", content: "Replace this with a one-sentence description of your app." },
+      { title: "Video Splitter — Lossless 30s Chunks in Your Browser" },
+      {
+        name: "description",
+        content:
+          "Split videos into exact 30-second chunks entirely in your browser. Lossless stream copy, zero re-encoding, MP4/MKV/MOV/AVI supported.",
+      },
+      { property: "og:title", content: "Video Splitter — Lossless 30s Chunks" },
+      {
+        property: "og:description",
+        content: "Client-side video splitting with FFmpeg.wasm. No uploads, no quality loss.",
+      },
     ],
   }),
   component: Index,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
 function Index() {
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
-    </div>
+    <main className="min-h-screen bg-background text-foreground">
+      <VideoSplitter />
+    </main>
   );
 }
