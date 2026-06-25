@@ -1,30 +1,53 @@
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { toBlobURL } from "@ffmpeg/util";
+// Vite bundles the worker module and gives us a URL we can pass to FFmpeg.
+// This resolves the worker's relative imports at build time so it can run
+// from a module Worker without "Failed to fetch module" errors.
+import ffmpegWorkerURL from "./ffmpeg-worker-entry.ts?worker&url";
 
 let ffmpegInstance: FFmpeg | null = null;
 let loadPromise: Promise<FFmpeg> | null = null;
 
-const CORE_VERSION = "0.12.6";
-const CORE_BASE = `https://unpkg.com/@ffmpeg/core@${CORE_VERSION}/dist/umd`;
+const CORE_VERSION = "0.12.10";
+// ESM core (with default export) works with module workers; UMD core needs
+// importScripts which module workers lack. 0.12.6 ESM lacks the default
+// export — 0.12.10+ ships it.
+const CORE_BASE = `https://cdn.jsdelivr.net/npm/@ffmpeg/core@${CORE_VERSION}/dist/esm`;
 
 export async function getFFmpeg(
   onLog?: (msg: string) => void,
   onProgress?: (ratio: number) => void,
 ): Promise<FFmpeg> {
-  if (ffmpegInstance) return ffmpegInstance;
+  if (ffmpegInstance) {
+    if (onLog) ffmpegInstance.on("log", ({ message }) => onLog(message));
+    if (onProgress) ffmpegInstance.on("progress", ({ progress }) => onProgress(progress));
+    return ffmpegInstance;
+  }
   if (loadPromise) return loadPromise;
 
   loadPromise = (async () => {
-    const ffmpeg = new FFmpeg();
-    if (onLog) ffmpeg.on("log", ({ message }) => onLog(message));
-    if (onProgress) ffmpeg.on("progress", ({ progress }) => onProgress(progress));
+    try {
+      const ffmpeg = new FFmpeg();
+      ffmpeg.on("log", ({ message }) => {
+        // eslint-disable-next-line no-console
+        console.debug("[ffmpeg]", message);
+        onLog?.(message);
+      });
+      if (onProgress) ffmpeg.on("progress", ({ progress }) => onProgress(progress));
 
-    await ffmpeg.load({
-      coreURL: await toBlobURL(`${CORE_BASE}/ffmpeg-core.js`, "text/javascript"),
-      wasmURL: await toBlobURL(`${CORE_BASE}/ffmpeg-core.wasm`, "application/wasm"),
-    });
-    ffmpegInstance = ffmpeg;
-    return ffmpeg;
+      const [coreURL, wasmURL] = await Promise.all([
+        toBlobURL(`${CORE_BASE}/ffmpeg-core.js`, "text/javascript"),
+        toBlobURL(`${CORE_BASE}/ffmpeg-core.wasm`, "application/wasm"),
+      ]);
+
+      await ffmpeg.load({ coreURL, wasmURL, classWorkerURL: ffmpegWorkerURL });
+      ffmpegInstance = ffmpeg;
+      return ffmpeg;
+    } catch (e) {
+      loadPromise = null;
+      ffmpegInstance = null;
+      throw e;
+    }
   })();
 
   return loadPromise;
