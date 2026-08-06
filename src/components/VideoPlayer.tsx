@@ -193,6 +193,7 @@ function VideoPlayerImpl({
       v.removeEventListener("playing", onPlayingEv);
       v.removeEventListener("pause", onPause);
       v.removeEventListener("canplay", onCanPlay);
+      v.removeEventListener("canplaythrough", onCanPlay);
       v.removeEventListener("seeking", onSeeking);
       v.removeEventListener("seeked", onSeeked);
       v.removeEventListener("ended", onEnd);
