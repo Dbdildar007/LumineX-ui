@@ -132,6 +132,7 @@ export default function GlassHeader() {
               <span className="bg-gradient-to-r from-fuchsia-500 to-cyan-400 bg-clip-text text-transparent">
                 X
               </span>
+              n
             </h1>
 
             <p className="hidden text-[10px] font-semibold uppercase tracking-[0.22em] text-gray-500 sm:block">
