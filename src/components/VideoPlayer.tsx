@@ -237,9 +237,20 @@ function VideoPlayerImpl({
         }
       }
     };
+    const onWebkitEnd = () => {
+      setIsFullscreen(false);
+      const el = containerRef.current;
+      if (el) setTimeout(() => el.scrollIntoView({ block: "center", behavior: "smooth" }), 80);
+    };
+    const v = videoRef.current;
     document.addEventListener("fullscreenchange", onFsChange);
-    return () => document.removeEventListener("fullscreenchange", onFsChange);
+    v?.addEventListener("webkitendfullscreen", onWebkitEnd);
+    return () => {
+      document.removeEventListener("fullscreenchange", onFsChange);
+      v?.removeEventListener("webkitendfullscreen", onWebkitEnd);
+    };
   }, []);
+
 
 
   const toggleFullscreen = useCallback((e?: React.SyntheticEvent) => {
