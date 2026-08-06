@@ -155,11 +155,15 @@ function VideoPlayerImpl({
       lastTickRef.current = v.currentTime;
     };
     const onPause = () => setPlaying(false);
-    const onCanPlay = () => setBuffering(false);
+    const onCanPlay = () => {
+      if (!v.seeking) setBuffering(false);
+    };
     const onSeeking = () => setBuffering(true);
     const onSeeked = () => {
       lastTickRef.current = v.currentTime;
-      setBuffering(false);
+      // Keep the indicator until the browser actually has frames to render:
+      // readyState >= 3 (HAVE_FUTURE_DATA) or the "playing" event clears it.
+      if (v.readyState >= 3) setBuffering(false);
     };
 
     const onEnd = () => {
