@@ -517,11 +517,12 @@ active:scale-90
 
       {/* Bottom glass bar */}
       <div
-        className={`absolute inset-x-0 bottom-0 z-30 bg-gradient-to-t from-black/85 via-black/35 to-transparent px-2.5 pb-2 pt-8 transition-opacity duration-300 sm:px-3 ${showControls && !adActive ? "opacity-100" : "pointer-events-none opacity-0"
+        className={`pointer-events-none absolute inset-x-0 bottom-0 z-30 bg-gradient-to-t from-black/85 via-black/35 to-transparent px-2.5 pb-2 pt-8 transition-opacity duration-300 sm:px-3 ${showControls && !adActive ? "opacity-100" : "opacity-0"
           }`}
       >
         {/* Seek bar */}
         <div
+
           ref={progressRef}
           data-control
           role="slider"
