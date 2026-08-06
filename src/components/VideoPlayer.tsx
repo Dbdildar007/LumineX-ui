@@ -472,8 +472,16 @@ function VideoPlayerImpl({
       )}
 
       {buffering && !adActive && (
-        <div className="pointer-events-none absolute inset-0 z-20 grid place-items-center">
-          <Loader2 className="h-10 w-10 animate-spin text-white/80 drop-shadow-[0_0_14px_rgba(255,255,255,0.5)]" />
+        <div className="pointer-events-none absolute inset-0 z-30 grid place-items-center">
+          <div className="flex items-center gap-2 rounded-full border border-white/25 bg-black/45 px-3 py-1.5 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.9)] backdrop-blur-xl animate-in fade-in zoom-in duration-200 sm:gap-2.5 sm:px-3.5 sm:py-2">
+            <span className="relative grid h-5 w-5 place-items-center sm:h-6 sm:w-6">
+              <span className="absolute inset-0 rounded-full border-2 border-white/20" />
+              <Loader2 className="h-5 w-5 animate-spin text-white sm:h-6 sm:w-6" />
+            </span>
+            <span className="text-[10px] font-black uppercase tracking-[0.18em] text-white/90 sm:text-[11px]">
+              Loading
+            </span>
+          </div>
         </div>
       )}
 
