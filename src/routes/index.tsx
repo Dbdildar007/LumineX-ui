@@ -551,6 +551,7 @@ function VideoCard({
 
   const longPressed = useRef(false);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+  const hoverTimer = useRef<NodeJS.Timeout | null>(null);
 
   const isTouchDevice = () => {
     return (
@@ -561,15 +562,27 @@ function VideoCard({
 
   const handleMouseEnter = () => {
     if (!isTouchDevice()) {
-      setPreviewVideoId(video.id);
+      // Desktop only: wait 1s of sustained hover before starting the preview.
+      if (hoverTimer.current) clearTimeout(hoverTimer.current);
+      hoverTimer.current = setTimeout(() => setPreviewVideoId(video.id), 1000);
     }
   };
 
   const handleMouseLeave = () => {
     if (!isTouchDevice()) {
+      if (hoverTimer.current) {
+        clearTimeout(hoverTimer.current);
+        hoverTimer.current = null;
+      }
       setPreviewVideoId(null);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (hoverTimer.current) clearTimeout(hoverTimer.current);
+    };
+  }, []);
 
 
   const handleTouchStart = () => {
