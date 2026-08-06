@@ -570,7 +570,10 @@ shadow-[0_0_8px_rgba(255,255,255,0.8)]"
         </div>
 
         {/* One row: speed · mute · time · fullscreen */}
-        <div className="flex items-center gap-2 text-white">
+        <div
+          className={`flex items-center gap-2 text-white ${showControls && !adActive ? "pointer-events-auto" : "pointer-events-none"
+            }`}
+        >
           <div className="relative">
             <button
               type="button"
