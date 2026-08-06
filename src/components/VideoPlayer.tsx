@@ -178,6 +178,7 @@ function VideoPlayerImpl({
     v.addEventListener("playing", onPlayingEv);
     v.addEventListener("pause", onPause);
     v.addEventListener("canplay", onCanPlay);
+    v.addEventListener("canplaythrough", onCanPlay);
     v.addEventListener("seeking", onSeeking);
     v.addEventListener("seeked", onSeeked);
     v.addEventListener("ended", onEnd);
