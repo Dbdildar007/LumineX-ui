@@ -11,7 +11,6 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -78,20 +77,25 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "DramaReel — Vertical Short Dramas, Nonstop" },
+      { name: "description", content: "Binge bite-sized vertical dramas: romance, revenge, werewolves and billionaire brides. Swipe. Watch. Repeat." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "DramaReel — Vertical Short Dramas, Nonstop" },
+      { property: "og:description", content: "Binge bite-sized vertical dramas: romance, revenge, werewolves and billionaire brides. Swipe. Watch. Repeat." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "DramaReel — Vertical Short Dramas, Nonstop" },
+      { name: "twitter:description", content: "Binge bite-sized vertical dramas: romance, revenge, werewolves and billionaire brides. Swipe. Watch. Repeat." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/b2621816-6355-4af5-a9b8-0fd3e8338fcf/id-preview-9c54cda6--19b1645f-477b-4d4b-9636-7f37b717bdc3.lovable.app-1784014635238.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/b2621816-6355-4af5-a9b8-0fd3e8338fcf/id-preview-9c54cda6--19b1645f-477b-4d4b-9636-7f37b717bdc3.lovable.app-1784014635238.png" },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
       },
+      { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
     ],
   }),
   shellComponent: RootShell,
@@ -119,8 +123,8 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
-      <Toaster richColors position="top-center" />
     </QueryClientProvider>
   );
 }
