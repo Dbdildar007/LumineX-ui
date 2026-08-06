@@ -223,11 +223,24 @@ function VideoPlayerImpl({
       setIsFullscreen(active);
       const orientation = (screen as any).orientation;
       if (active) orientation?.lock?.("landscape").catch(() => { });
-      else orientation?.unlock?.();
+      else {
+        orientation?.unlock?.();
+        // Exiting fullscreen can leave the page scrolled away from the player.
+        // Bring the player back into view so playback stays visible.
+        const el = containerRef.current;
+        if (el) {
+          requestAnimationFrame(() => {
+            setTimeout(() => {
+              el.scrollIntoView({ block: "center", behavior: "smooth" });
+            }, 60);
+          });
+        }
+      }
     };
     document.addEventListener("fullscreenchange", onFsChange);
     return () => document.removeEventListener("fullscreenchange", onFsChange);
   }, []);
+
 
   const toggleFullscreen = useCallback((e?: React.SyntheticEvent) => {
     e?.stopPropagation();
