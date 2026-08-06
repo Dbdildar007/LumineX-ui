@@ -437,9 +437,9 @@ function VideoPlayerImpl({
   return (
     <div
       ref={containerRef}
-      className={`group/player relative w-full select-none overflow-hidden bg-black shadow-[0_24px_60px_-28px_rgba(20,10,40,0.75)] [perspective:1400px] ${isFullscreen
+      className={`group/player relative mx-auto w-full select-none overflow-hidden bg-black shadow-[0_24px_60px_-28px_rgba(20,10,40,0.75)] [perspective:1400px] ${isFullscreen
         ? "rounded-none"
-        : "rounded-xl border border-white/25 sm:rounded-2xl"
+        : "rounded-xl border border-white/25 sm:rounded-2xl md:max-h-[68vh]"
         } ${className ?? ""}`}
       style={{ aspectRatio: isFullscreen ? undefined : "16 / 9", height: isFullscreen ? "100%" : undefined }}
       onPointerDown={onGesturePointerDown}
