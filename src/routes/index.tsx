@@ -36,13 +36,13 @@ import {
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Sipario Reel — Watch Short Videos by Category & Cast" },
+      { title: " luminXn — Watch Short Videos by Category & Cast" },
       {
         name: "description",
         content:
           "Stream bite-size vertical videos. Search instantly by title, category or actor, filter by genre and keep watching with auto-queued similar videos.",
       },
-      { property: "og:title", content: "Sipario Reel — Short Video Streaming" },
+      { property: "og:title", content: "luminXn — Short Video Streaming" },
       {
         property: "og:description",
         content: "Search by title, category or actor. Play instantly, discover similar videos.",
