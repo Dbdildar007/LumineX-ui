@@ -551,6 +551,7 @@ function VideoCard({
 
   const longPressed = useRef(false);
   const longPressTimer = useRef<NodeJS.Timeout | null>(null);
+  const hoverTimer = useRef<NodeJS.Timeout | null>(null);
 
   const isTouchDevice = () => {
     return (
@@ -561,15 +562,27 @@ function VideoCard({
 
   const handleMouseEnter = () => {
     if (!isTouchDevice()) {
-      setPreviewVideoId(video.id);
+      // Desktop only: wait 1s of sustained hover before starting the preview.
+      if (hoverTimer.current) clearTimeout(hoverTimer.current);
+      hoverTimer.current = setTimeout(() => setPreviewVideoId(video.id), 1000);
     }
   };
 
   const handleMouseLeave = () => {
     if (!isTouchDevice()) {
+      if (hoverTimer.current) {
+        clearTimeout(hoverTimer.current);
+        hoverTimer.current = null;
+      }
       setPreviewVideoId(null);
     }
   };
+
+  useEffect(() => {
+    return () => {
+      if (hoverTimer.current) clearTimeout(hoverTimer.current);
+    };
+  }, []);
 
 
   const handleTouchStart = () => {
@@ -635,36 +648,42 @@ function VideoCard({
           preload="none"
           className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${preview ? "opacity-100" : "opacity-0"}`}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
+        {/* Every overlay (gradient, rank, duration, play hint, meta) hides while
+            the preview plays — both desktop hover and mobile long-press. */}
+        {!preview && (
+          <>
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/15 to-transparent" />
 
-        {rank !== undefined && (
-          <span className="absolute left-2 top-2 grid h-7 min-w-7 place-items-center rounded-xl border border-white/40 bg-white/25 px-1.5 text-xs font-black text-white backdrop-blur-xl">
-            {rank}
-          </span>
-        )}
+            {rank !== undefined && (
+              <span className="absolute left-2 top-2 grid h-7 min-w-7 place-items-center rounded-xl border border-white/40 bg-white/25 px-1.5 text-xs font-black text-white backdrop-blur-xl">
+                {rank}
+              </span>
+            )}
 
-        <span className="absolute right-2 top-2 rounded-lg border border-white/30 bg-black/45 px-1.5 py-0.5 text-[10px] font-bold text-white backdrop-blur">
-          {formatDuration(video.durationSeconds)}
-        </span>
-
-        <span className="pointer-events-none absolute inset-0 grid place-items-center opacity-0 transition group-hover:opacity-100">
-          <span className="grid h-12 w-12 place-items-center rounded-full border border-white/50 bg-white/20 text-white backdrop-blur-xl">
-            <Play className="h-5 w-5 fill-current pl-0.5" />
-          </span>
-        </span>
-
-        <div className="absolute inset-x-0 bottom-0 p-2.5 text-white">
-          <div className="truncate text-[9px] font-bold uppercase tracking-[0.15em] text-white/75">
-            {video.category}
-          </div>
-          <div className="line-clamp-2 text-[13px] font-black leading-tight">{video.title}</div>
-          <div className="mt-1 flex items-center gap-2 text-[10px] font-semibold text-white/80">
-            <span className="flex items-center gap-1">
-              <Eye className="h-3 w-3" /> {formatViews(video.views)}
+            <span className="absolute right-2 top-2 rounded-lg border border-white/30 bg-black/45 px-1.5 py-0.5 text-[10px] font-bold text-white backdrop-blur">
+              {formatDuration(video.durationSeconds)}
             </span>
-            {video.actors[0] && <span className="truncate">{video.actors[0]}</span>}
-          </div>
-        </div>
+
+            <span className="pointer-events-none absolute inset-0 grid place-items-center opacity-0 transition group-hover:opacity-100">
+              <span className="grid h-12 w-12 place-items-center rounded-full border border-white/50 bg-white/20 text-white backdrop-blur-xl">
+                <Play className="h-5 w-5 fill-current pl-0.5" />
+              </span>
+            </span>
+
+            <div className="absolute inset-x-0 bottom-0 p-2.5 text-white">
+              <div className="truncate text-[9px] font-bold uppercase tracking-[0.15em] text-white/75">
+                {video.category}
+              </div>
+              <div className="line-clamp-2 text-[13px] font-black leading-tight">{video.title}</div>
+              <div className="mt-1 flex items-center gap-2 text-[10px] font-semibold text-white/80">
+                <span className="flex items-center gap-1">
+                  <Eye className="h-3 w-3" /> {formatViews(video.views)}
+                </span>
+                {video.actors[0] && <span className="truncate">{video.actors[0]}</span>}
+              </div>
+            </div>
+          </>
+        )}
       </div>
     </button>
   );
