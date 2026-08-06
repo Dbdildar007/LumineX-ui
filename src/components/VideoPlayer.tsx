@@ -477,8 +477,10 @@ function VideoPlayerImpl({
           onClick={togglePlay}
           aria-label={playing ? "Pause" : "Play"}
           className="
-grid h-[52px] w-[52px]
+grid h-16 w-16 sm:h-[52px] sm:w-[52px]
+touch-manipulation
 place-items-center
+
 rounded-full
 
 border-0
