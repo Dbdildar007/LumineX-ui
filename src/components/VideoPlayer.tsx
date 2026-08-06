@@ -223,11 +223,35 @@ function VideoPlayerImpl({
       setIsFullscreen(active);
       const orientation = (screen as any).orientation;
       if (active) orientation?.lock?.("landscape").catch(() => { });
-      else orientation?.unlock?.();
+      else {
+        orientation?.unlock?.();
+        // Exiting fullscreen can leave the page scrolled away from the player.
+        // Bring the player back into view so playback stays visible.
+        const el = containerRef.current;
+        if (el) {
+          requestAnimationFrame(() => {
+            setTimeout(() => {
+              el.scrollIntoView({ block: "center", behavior: "smooth" });
+            }, 60);
+          });
+        }
+      }
     };
+    const onWebkitEnd = () => {
+      setIsFullscreen(false);
+      const el = containerRef.current;
+      if (el) setTimeout(() => el.scrollIntoView({ block: "center", behavior: "smooth" }), 80);
+    };
+    const v = videoRef.current;
     document.addEventListener("fullscreenchange", onFsChange);
-    return () => document.removeEventListener("fullscreenchange", onFsChange);
+    v?.addEventListener("webkitendfullscreen", onWebkitEnd);
+    return () => {
+      document.removeEventListener("fullscreenchange", onFsChange);
+      v?.removeEventListener("webkitendfullscreen", onWebkitEnd);
+    };
   }, []);
+
+
 
   const toggleFullscreen = useCallback((e?: React.SyntheticEvent) => {
     e?.stopPropagation();
@@ -464,8 +488,10 @@ function VideoPlayerImpl({
           onClick={togglePlay}
           aria-label={playing ? "Pause" : "Play"}
           className="
-grid h-[52px] w-[52px]
+grid h-16 w-16 sm:h-[52px] sm:w-[52px]
+touch-manipulation
 place-items-center
+
 rounded-full
 
 border-0
@@ -502,11 +528,12 @@ active:scale-90
 
       {/* Bottom glass bar */}
       <div
-        className={`absolute inset-x-0 bottom-0 z-30 bg-gradient-to-t from-black/85 via-black/35 to-transparent px-2.5 pb-2 pt-8 transition-opacity duration-300 sm:px-3 ${showControls && !adActive ? "opacity-100" : "pointer-events-none opacity-0"
+        className={`pointer-events-none absolute inset-x-0 bottom-0 z-30 bg-gradient-to-t from-black/85 via-black/35 to-transparent px-2.5 pb-2 pt-8 transition-opacity duration-300 sm:px-3 ${showControls && !adActive ? "opacity-100" : "opacity-0"
           }`}
       >
         {/* Seek bar */}
         <div
+
           ref={progressRef}
           data-control
           role="slider"
@@ -515,7 +542,9 @@ active:scale-90
           aria-valuemax={duration}
           aria-valuenow={currentTime}
           tabIndex={0}
-          className="group/bar relative mb-2 h-4 w-full cursor-pointer touch-none"
+          className={`group/bar relative mb-2 h-4 w-full cursor-pointer touch-none ${showControls && !adActive ? "pointer-events-auto" : "pointer-events-none"
+            }`}
+
           onPointerDown={(e) => {
             e.stopPropagation();
             (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
@@ -552,7 +581,10 @@ shadow-[0_0_8px_rgba(255,255,255,0.8)]"
         </div>
 
         {/* One row: speed · mute · time · fullscreen */}
-        <div className="flex items-center gap-2 text-white">
+        <div
+          className={`flex items-center gap-2 text-white ${showControls && !adActive ? "pointer-events-auto" : "pointer-events-none"
+            }`}
+        >
           <div className="relative">
             <button
               type="button"
