@@ -531,7 +531,9 @@ active:scale-90
           aria-valuemax={duration}
           aria-valuenow={currentTime}
           tabIndex={0}
-          className="group/bar relative mb-2 h-4 w-full cursor-pointer touch-none"
+          className={`group/bar relative mb-2 h-4 w-full cursor-pointer touch-none ${showControls && !adActive ? "pointer-events-auto" : "pointer-events-none"
+            }`}
+
           onPointerDown={(e) => {
             e.stopPropagation();
             (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
