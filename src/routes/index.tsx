@@ -675,16 +675,22 @@ function VideoCard({
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchEnd}
-      className={`group relative w-full overflow-hidden rounded-2xl border border-white/55 bg-white/40 text-left shadow-[0_18px_35px_-22px_rgba(50,20,80,0.85),inset_0_1px_0_rgba(255,255,255,0.85)] backdrop-blur-xl transition-all duration-300 [perspective:900px] active:scale-[0.97] ${preview ? "z-10 md:scale-[1.06] md:shadow-[0_28px_55px_-18px_rgba(40,15,70,0.6)]" : ""
+      onKeyDown={handleKeyDown}
+      onFocus={() => setPreviewVideoId(null)}
+      aria-label={`Play ${video.title}. ${video.category}, ${formatDuration(video.durationSeconds)}, ${formatViews(video.views)} views${video.actors[0] ? `, starring ${video.actors.join(", ")}` : ""}. Press P to preview.`}
+      aria-pressed={preview}
+      className={`group relative w-full overflow-hidden rounded-2xl border border-white/55 bg-white/40 text-left shadow-[0_18px_35px_-22px_rgba(50,20,80,0.85),inset_0_1px_0_rgba(255,255,255,0.85)] backdrop-blur-xl transition-all duration-300 [perspective:900px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:scale-[0.97] ${preview ? "z-10 md:scale-[1.06] md:shadow-[0_28px_55px_-18px_rgba(40,15,70,0.6)]" : ""
         }`}
     >
       <div className="relative aspect-[9/13] w-full">
         <img
           src={video.poster}
-          alt={video.title}
+          alt=""
+          aria-hidden="true"
           loading="lazy"
           className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${preview ? "opacity-0" : "opacity-100"}`}
         />
+
         <video
           ref={vidRef}
           src={video.videoUrl}
