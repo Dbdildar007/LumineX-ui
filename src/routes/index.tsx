@@ -607,7 +607,7 @@ function VideoCard({
     if (!isTouchDevice()) {
       // Desktop only: wait 2s of sustained hover before starting the preview.
       if (hoverTimer.current) clearTimeout(hoverTimer.current);
-      hoverTimer.current = setTimeout(() => setPreviewVideoId(video.id), 2000);
+      hoverTimer.current = setTimeout(() => setPreviewVideoId(video.id), 1500);
 
     }
   };
