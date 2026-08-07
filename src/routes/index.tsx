@@ -244,8 +244,22 @@ function Home() {
   }, [feed.hasNextPage, feed.isFetchingNextPage, feed]);
 
   const openVideo = useCallback((v: VideoItem) => {
+    setPreviewVideoId(null);
     setActive(v);
+    setAnnouncement(`Now playing ${v.title}`);
   }, []);
+
+  // Jump (no animated scroll) to the player and move focus there, so keyboard
+  // and screen-reader users land on the video that just started playing.
+  useEffect(() => {
+    if (!active) return;
+    const el = watchRef.current;
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + window.scrollY - 12;
+    window.scrollTo({ top: Math.max(top, 0), behavior: "auto" });
+    el.focus({ preventScroll: true });
+  }, [active?.id]);
+
 
 
   // Live view counting: fires 5s into playback, persists in the DB and updates
