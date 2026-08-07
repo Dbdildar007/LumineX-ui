@@ -238,8 +238,8 @@ function Home() {
 
   const openVideo = useCallback((v: VideoItem) => {
     setActive(v);
-    window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
+
 
   // Live view counting: fires 5s into playback, persists in the DB and updates
 
