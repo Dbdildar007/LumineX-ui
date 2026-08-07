@@ -170,7 +170,14 @@ function Home() {
     };
   }, []);
 
-  const onSearch = useCallback((q: string) => setSearch(q), []);
+  const onSearch = useCallback((q: string) => {
+    setSearch(q);
+    // Searching from anywhere returns to the results-only view (Netflix-style).
+    if (q) setActive(null);
+  }, []);
+
+  const watchRef = useRef<HTMLDivElement | null>(null);
+  const [announcement, setAnnouncement] = useState("");
 
   const feed = useInfiniteQuery({
     queryKey: ["videos", search, category],
@@ -237,8 +244,31 @@ function Home() {
   }, [feed.hasNextPage, feed.isFetchingNextPage, feed]);
 
   const openVideo = useCallback((v: VideoItem) => {
+    setPreviewVideoId(null);
     setActive(v);
+    setAnnouncement(`Now playing ${v.title}`);
   }, []);
+
+  // Jump (no animated scroll) to the player and move focus there, so keyboard
+  // and screen-reader users land on the video that just started playing.
+  useEffect(() => {
+    if (!active) return;
+    const timers: number[] = [];
+    const settle = () => {
+      const el = watchRef.current;
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + window.scrollY - 12;
+      window.scrollTo({ top: Math.max(top, 0), behavior: "auto" });
+      if (document.activeElement !== el) el.focus({ preventScroll: true });
+    };
+    // Re-assert a few times: the player mounting, poster/video loads and feed
+    // re-renders can shift layout, and we always want to land on the player.
+    settle();
+    [0, 60, 160, 320].forEach((d) => timers.push(window.setTimeout(settle, d)));
+    return () => timers.forEach(clearTimeout);
+  }, [active?.id]);
+
+
 
 
   // Live view counting: fires 5s into playback, persists in the DB and updates
@@ -266,13 +296,22 @@ function Home() {
     <div className="min-h-screen overflow-x-hidden pb-32">
       <GlassHeader />
 
+      <div aria-live="polite" role="status" className="sr-only">
+        {announcement}
+      </div>
+
       <section className="mx-auto w-full max-w-6xl px-3 pt-3 sm:px-4 sm:pt-4">
         <SearchBar onSearch={onSearch} />
         <BannerAd className="mt-3" />
       </section>
 
-      {activeWithBumps && (
-        <section className="mx-auto w-full max-w-6xl px-1.5 pt-3 sm:px-4 sm:pt-4">
+      {activeWithBumps && !isSearching && (
+        <section
+          ref={watchRef}
+          tabIndex={-1}
+          aria-label={`Now playing: ${activeWithBumps.title}`}
+          className="mx-auto w-full max-w-6xl px-1.5 pt-3 outline-none focus-visible:ring-2 focus-visible:ring-primary/50 sm:px-4 sm:pt-4"
+        >
           <WatchView
             key={activeWithBumps.id}
             video={activeWithBumps}
@@ -285,6 +324,7 @@ function Home() {
           />
         </section>
       )}
+
 
       <CategoryRail
         categories={categoriesQuery.data ?? []}
@@ -518,6 +558,8 @@ function CategoryRail({
               key={c}
               type="button"
               onClick={() => onSelect(c)}
+              aria-pressed={active === c}
+              aria-label={`Filter by ${c} category`}
               className={`shrink-0 whitespace-nowrap rounded-2xl px-4 py-2 text-xs font-black transition active:scale-95 ${active === c
                 ? "gradient-hero text-primary-foreground glow-primary"
                 : "border border-white/60 bg-white/45 text-foreground/80 backdrop-blur-xl hover:bg-white/70"
@@ -612,6 +654,19 @@ function VideoCard({
     }
   };
 
+  // Keyboard support: Enter/Space plays (native button), P toggles the muted
+  // preview, Escape stops it. Announced to screen readers via aria-pressed.
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === "p" || e.key === "P") {
+      e.preventDefault();
+      setPreviewVideoId(preview ? null : video.id);
+    } else if (e.key === "Escape" && preview) {
+      e.preventDefault();
+      setPreviewVideoId(null);
+    }
+  };
+
+
   useEffect(() => {
     const v = vidRef.current;
     if (!v) return;
@@ -631,16 +686,22 @@ function VideoCard({
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchEnd}
-      className={`group relative w-full overflow-hidden rounded-2xl border border-white/55 bg-white/40 text-left shadow-[0_18px_35px_-22px_rgba(50,20,80,0.85),inset_0_1px_0_rgba(255,255,255,0.85)] backdrop-blur-xl transition-all duration-300 [perspective:900px] active:scale-[0.97] ${preview ? "z-10 md:scale-[1.06] md:shadow-[0_28px_55px_-18px_rgba(40,15,70,0.6)]" : ""
+      onKeyDown={handleKeyDown}
+      onFocus={() => setPreviewVideoId(null)}
+      aria-label={`Play ${video.title}. ${video.category}, ${formatDuration(video.durationSeconds)}, ${formatViews(video.views)} views${video.actors[0] ? `, starring ${video.actors.join(", ")}` : ""}. Press P to preview.`}
+      aria-pressed={preview}
+      className={`group relative w-full overflow-hidden rounded-2xl border border-white/55 bg-white/40 text-left shadow-[0_18px_35px_-22px_rgba(50,20,80,0.85),inset_0_1px_0_rgba(255,255,255,0.85)] backdrop-blur-xl transition-all duration-300 [perspective:900px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 active:scale-[0.97] ${preview ? "z-10 md:scale-[1.06] md:shadow-[0_28px_55px_-18px_rgba(40,15,70,0.6)]" : ""
         }`}
     >
       <div className="relative aspect-[9/13] w-full">
         <img
           src={video.poster}
-          alt={video.title}
+          alt=""
+          aria-hidden="true"
           loading="lazy"
           className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${preview ? "opacity-0" : "opacity-100"}`}
         />
+
         <video
           ref={vidRef}
           src={video.videoUrl}
@@ -648,6 +709,8 @@ function VideoCard({
           loop
           playsInline
           preload="none"
+          aria-hidden="true"
+          tabIndex={-1}
           className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${preview ? "opacity-100" : "opacity-0"}`}
         />
         {/* Every overlay (gradient, rank, duration, play hint, meta) hides while

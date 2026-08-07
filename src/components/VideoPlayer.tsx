@@ -237,7 +237,7 @@ function VideoPlayerImpl({
         if (el) {
           requestAnimationFrame(() => {
             setTimeout(() => {
-              el.scrollIntoView({ block: "center", behavior: "smooth" });
+              el.scrollIntoView({ block: "center", behavior: "auto" });
             }, 60);
           });
         }
@@ -246,7 +246,7 @@ function VideoPlayerImpl({
     const onWebkitEnd = () => {
       setIsFullscreen(false);
       const el = containerRef.current;
-      if (el) setTimeout(() => el.scrollIntoView({ block: "center", behavior: "smooth" }), 80);
+      if (el) setTimeout(() => el.scrollIntoView({ block: "center", behavior: "auto" }), 80);
     };
     const v = videoRef.current;
     document.addEventListener("fullscreenchange", onFsChange);
