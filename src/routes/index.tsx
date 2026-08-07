@@ -698,6 +698,8 @@ function VideoCard({
           loop
           playsInline
           preload="none"
+          aria-hidden="true"
+          tabIndex={-1}
           className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-300 ${preview ? "opacity-100" : "opacity-0"}`}
         />
         {/* Every overlay (gradient, rank, duration, play hint, meta) hides while
