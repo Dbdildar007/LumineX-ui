@@ -549,6 +549,8 @@ function CategoryRail({
               key={c}
               type="button"
               onClick={() => onSelect(c)}
+              aria-pressed={active === c}
+              aria-label={`Filter by ${c} category`}
               className={`shrink-0 whitespace-nowrap rounded-2xl px-4 py-2 text-xs font-black transition active:scale-95 ${active === c
                 ? "gradient-hero text-primary-foreground glow-primary"
                 : "border border-white/60 bg-white/45 text-foreground/80 backdrop-blur-xl hover:bg-white/70"
