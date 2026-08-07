@@ -75,6 +75,14 @@
 @layer base {
   * { border-color: var(--color-border); }
   html, body, #root { height: 100%; }
+  /* Hide every scrollbar (desktop + mobile) while keeping scrolling functional */
+  html, body, #root, * {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  html::-webkit-scrollbar,
+  body::-webkit-scrollbar,
+  *::-webkit-scrollbar { display: none; width: 0; height: 0; }
   body {
     background: radial-gradient(1200px 600px at 8% -12%, oklch(0.9 0.06 320 / 55%), transparent 62%),
                 radial-gradient(900px 520px at 100% 4%, oklch(0.92 0.05 12 / 55%), transparent 62%),
@@ -85,6 +93,7 @@
     overscroll-behavior-y: none;
   }
 }
+
 
 @utility neo-card {
   background: var(--gradient-card);
