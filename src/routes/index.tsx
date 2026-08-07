@@ -296,7 +296,7 @@ function Home() {
         <BannerAd className="mt-3" />
       </section>
 
-      {activeWithBumps && (
+      {activeWithBumps && !isSearching && (
         <section
           ref={watchRef}
           tabIndex={-1}
