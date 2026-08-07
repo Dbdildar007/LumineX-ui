@@ -170,7 +170,14 @@ function Home() {
     };
   }, []);
 
-  const onSearch = useCallback((q: string) => setSearch(q), []);
+  const onSearch = useCallback((q: string) => {
+    setSearch(q);
+    // Searching from anywhere returns to the results-only view (Netflix-style).
+    if (q) setActive(null);
+  }, []);
+
+  const watchRef = useRef<HTMLDivElement | null>(null);
+  const [announcement, setAnnouncement] = useState("");
 
   const feed = useInfiniteQuery({
     queryKey: ["videos", search, category],
