@@ -287,13 +287,22 @@ function Home() {
     <div className="min-h-screen overflow-x-hidden pb-32">
       <GlassHeader />
 
+      <div aria-live="polite" role="status" className="sr-only">
+        {announcement}
+      </div>
+
       <section className="mx-auto w-full max-w-6xl px-3 pt-3 sm:px-4 sm:pt-4">
         <SearchBar onSearch={onSearch} />
         <BannerAd className="mt-3" />
       </section>
 
       {activeWithBumps && (
-        <section className="mx-auto w-full max-w-6xl px-1.5 pt-3 sm:px-4 sm:pt-4">
+        <section
+          ref={watchRef}
+          tabIndex={-1}
+          aria-label={`Now playing: ${activeWithBumps.title}`}
+          className="mx-auto w-full max-w-6xl px-1.5 pt-3 outline-none focus-visible:ring-2 focus-visible:ring-primary/50 sm:px-4 sm:pt-4"
+        >
           <WatchView
             key={activeWithBumps.id}
             video={activeWithBumps}
@@ -306,6 +315,7 @@ function Home() {
           />
         </section>
       )}
+
 
       <CategoryRail
         categories={categoriesQuery.data ?? []}
