@@ -75,6 +75,9 @@
 @layer base {
   * { border-color: var(--color-border); }
   html, body, #root { height: 100%; }
+  /* No animated scroll transitions and no scroll anchoring: opening a video
+     must land instantly on the player. */
+  html { scroll-behavior: auto; overflow-anchor: none; }
   /* Hide every scrollbar (desktop + mobile) while keeping scrolling functional */
   html, body, #root, * {
     scrollbar-width: none;
