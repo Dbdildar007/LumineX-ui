@@ -643,6 +643,19 @@ function VideoCard({
     }
   };
 
+  // Keyboard support: Enter/Space plays (native button), P toggles the muted
+  // preview, Escape stops it. Announced to screen readers via aria-pressed.
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (e.key === "p" || e.key === "P") {
+      e.preventDefault();
+      setPreviewVideoId(preview ? null : video.id);
+    } else if (e.key === "Escape" && preview) {
+      e.preventDefault();
+      setPreviewVideoId(null);
+    }
+  };
+
+
   useEffect(() => {
     const v = vidRef.current;
     if (!v) return;
