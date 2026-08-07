@@ -253,19 +253,19 @@ function Home() {
   // and screen-reader users land on the video that just started playing.
   useEffect(() => {
     if (!active) return;
-    let frames = 0;
+    const timers: number[] = [];
     const settle = () => {
       const el = watchRef.current;
-      if (el) {
-        const top = el.getBoundingClientRect().top + window.scrollY - 12;
-        window.scrollTo({ top: Math.max(top, 0), behavior: "auto" });
-        if (document.activeElement !== el) el.focus({ preventScroll: true });
-      }
-      // Re-assert for a couple of frames: the player mounting can shift layout
-      // or steal focus, and we always want to land on the playing video.
-      if (frames++ < 3) requestAnimationFrame(settle);
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + window.scrollY - 12;
+      window.scrollTo({ top: Math.max(top, 0), behavior: "auto" });
+      if (document.activeElement !== el) el.focus({ preventScroll: true });
     };
-    requestAnimationFrame(settle);
+    // Re-assert a few times: the player mounting, poster/video loads and feed
+    // re-renders can shift layout, and we always want to land on the player.
+    settle();
+    [0, 60, 160, 320].forEach((d) => timers.push(window.setTimeout(settle, d)));
+    return () => timers.forEach(clearTimeout);
   }, [active?.id]);
 
 
